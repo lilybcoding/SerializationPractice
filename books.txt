@@ -1,0 +1,5 @@
+1984, George Orwell, 1949, 9780151660346
+Dracula, Bram Stoker, 1897, 9798721052927
+Sense and Sensibility, Jane Austen, 1811, 9781140168792
+Missing Author, , 1900, 9781140168791
+Bad ISBN, author, 1901, 978
