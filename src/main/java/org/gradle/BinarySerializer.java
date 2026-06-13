@@ -4,10 +4,9 @@ import java.io.*;
 
 public class BinarySerializer {
 
-    // should I also have methods to serialize/deserialize sets of objects?
-    public static String serialize(Object object) {
+    public static void serialize(Object object, String filename) {
         try {
-            FileOutputStream file = new FileOutputStream("serialized.ser");
+            FileOutputStream file = new FileOutputStream(filename);
             ObjectOutputStream out = new ObjectOutputStream(file);
             out.writeObject(object);
             out.close();
@@ -15,7 +14,6 @@ public class BinarySerializer {
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
-        return "serialized.ser";
     }
 
     public static Object deserialize(String filename) {

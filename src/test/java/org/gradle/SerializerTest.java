@@ -1,12 +1,9 @@
 package org.gradle;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -14,79 +11,75 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class SerializerTest {
 
-    @Test
-    void BookSerializerFromManual() {
-        SortedSet<Book> books = new TreeSet<>();
-        Book book1 = new Book("1984", "George Orwell", 1949, "9780151660346");
+    private SortedSet<Book> books;
+    private String CSV_filename;
+    private String binaryFilenameString;
+    private Book book1;
+    private String book1File;
+    private String XML_filename;
+
+    @BeforeEach
+    void setUp() {
+        CSV_filename = "books.csv";
+        binaryFilenameString = "string.csv";
+        book1File = "book1.txt";
+        XML_filename = "books.xml";
+        books = new TreeSet<>();
+        book1 = new Book("1984", "George Orwell", 1949, "9780151660346");
         Book book2 = new Book("Dracula", "Bram Stoker", 1897, "9798721052927");
         Book book3 = new Book("Sense and Sensibility", "Jane Austen", 1811, "97811401687922");
 
         books.add(book1);
         books.add(book2);
         books.add(book3);
+    }
 
-        String filename = Book.serializeToCSV(books);
-        SortedSet<Book> deserializedBooks = Book.deserializeFromCSV(filename);
+    // Not sure what goes in tearDown --> put books.clear() for now
+    @AfterEach
+    void tearDown() {
+
+    }
+
+    @Test
+    void BookSerializerCSV() {
+
+        Book.serializeToCSV(books, CSV_filename);
+        SortedSet<Book> deserializedBooks = Book.deserializeFromCSV(CSV_filename);
 
         assertEquals(books, deserializedBooks);
     }
 
     @Test
-    void BookSerializerFromFile() {
+    void BookSerializerXML() {
+        Book.serializeToXML(books, XML_filename);
+        SortedSet<Book> deserializedBooks = Book.deserializeFromXML(XML_filename);
 
-        SortedSet<Book> books = new TreeSet<>();
-        List<String> bookLines = new ArrayList<>();
-        try {
-            bookLines = Files.readAllLines(Paths.get("books.txt"));
-        } catch (IOException e) {
-            System.out.println("Error reading books.txt file");
-        }
-        int lineNumber = 0;
-        boolean invalid;
-        for (String line : bookLines) {
-            invalid = false;
-            lineNumber++;
-            String[] split = line.split(",");
-            for (int i = 0; i<split.length; i++) {
-                split[i] = split[i].trim();
-                if (split[i].isEmpty()) {
-                    // Do you handle input errors the same in testing vs in a driver class?
-                    System.out.println("Empty value in line " + lineNumber + ". Not Adding.");
-                    invalid = true;
-                    break;
-                }
-            }
-            if  (invalid) {
-                continue;
-            }
-            if (split[3].length() != 13) {
-                System.out.println("Invalid ISBN in line " + lineNumber + ". Not Adding.");
-            } else {
-                Book book = new Book(split[0], split[1], Integer.parseInt(split[2]), split[3]);
-                books.add(book);
-            }
-
-            String filename = Book.serializeToCSV(books);
-            SortedSet<Book> deserializedBooks = Book.deserializeFromCSV(filename);
-
-            assertEquals(books, deserializedBooks);
-        }
+        assertEquals(books, deserializedBooks);
     }
+
     @Test
     void BinarySerializerWithBook() {
-        Book book1 = new Book("1984", "George Orwell", 1949, "9780151660346");
-
-        String binaryFilename = BinarySerializer.serialize(book1);
-        Book book1copy = (Book) BinarySerializer.deserialize(binaryFilename);
+        BinarySerializer.serialize(book1, book1File);
+        Book book1copy = (Book) BinarySerializer.deserialize(book1File);
 
         assertEquals(book1, book1copy);
+    }
+
+    @Test
+    void BinarySerializerWithBooks() {
+
+        BinarySerializer.serialize(books, CSV_filename);
+        @SuppressWarnings("unchecked")
+        SortedSet<Book> deserializedBooks = (SortedSet<Book>) BinarySerializer.deserialize(CSV_filename);
+
+        assertEquals(books, deserializedBooks);
     }
 
     @Test
     void BinarySerializerWithString() {
         String string = "hello";
 
-        String binaryFilenameString = BinarySerializer.serialize(string);
+        BinarySerializer.serialize(string, binaryFilenameString);
         String stringCopy = BinarySerializer.deserialize(binaryFilenameString).toString();
 
         assertEquals(string, stringCopy);
