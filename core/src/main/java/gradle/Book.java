@@ -39,7 +39,7 @@ public class Book implements Serializable, Comparable<Book> {
     }
 
     public static SortedSet<Book> deserializeFromCSV(String csv) {
-        List<String> bookLines = new ArrayList<>();
+        List<String> bookLines;
         try {
             bookLines = Files.readAllLines(Paths.get(csv));
         } catch (IOException e) {
