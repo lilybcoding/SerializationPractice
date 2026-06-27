@@ -1,4 +1,4 @@
-package org.gradle;
+package gradle;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,6 +13,7 @@ class SerializerTest {
 
     private SortedSet<Book> books;
     private String CSV_filename;
+    private String  binaryCSV_filename;
     private String binaryFilenameString;
     private Book book1;
     private String book1File;
@@ -24,6 +25,7 @@ class SerializerTest {
         binaryFilenameString = "string.csv";
         book1File = "book1.txt";
         XML_filename = "books.xml";
+        binaryCSV_filename = "books_binary.csv";
         books = new TreeSet<>();
         book1 = new Book("1984", "George Orwell", 1949, "9780151660346");
         Book book2 = new Book("Dracula", "Bram Stoker", 1897, "9798721052927");
@@ -68,9 +70,9 @@ class SerializerTest {
     @Test
     void BinarySerializerWithBooks() {
 
-        BinarySerializer.serialize(books, CSV_filename);
+        BinarySerializer.serialize(books, binaryCSV_filename);
         @SuppressWarnings("unchecked")
-        SortedSet<Book> deserializedBooks = (SortedSet<Book>) BinarySerializer.deserialize(CSV_filename);
+        SortedSet<Book> deserializedBooks = (SortedSet<Book>) BinarySerializer.deserialize(binaryCSV_filename);
 
         assertEquals(books, deserializedBooks);
     }

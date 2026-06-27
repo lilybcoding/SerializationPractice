@@ -1,9 +1,8 @@
-package org.gradle;
+package gradle;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.file.Files;
@@ -29,6 +28,7 @@ public class Book implements Serializable, Comparable<Book> {
     public static void serializeToCSV(SortedSet<Book> books, String filename) {
         try {
             Path path = Paths.get(filename);
+            Files.write(path, ("").getBytes());
             for (Book book : books) {
                 String content = book.prettyPrintToCSV();
                 Files.write(path, (content + "\n").getBytes(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
@@ -60,14 +60,14 @@ public class Book implements Serializable, Comparable<Book> {
 
     public static void serializeToXML(SortedSet<Book> books, String filename) {
         try {
+            Book[] bookArray = books.toArray(new Book[0]);
             XStream xstream = new XStream(new DomDriver());
             xstream.alias("book", Book.class);
             xstream.alias("books", Book[].class);
-            for (Book book : books) {
-                String xmlContent = xstream.toXML(book);
-                Path path = Paths.get(filename);
-                Files.write(path, (xmlContent + "\n").getBytes());
-            }
+            String xmlContent = xstream.toXML(bookArray);
+            Path path = Paths.get(filename);
+            Files.write(path, (xmlContent + "\n").getBytes());
+
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
